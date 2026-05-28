@@ -26,7 +26,7 @@ def ucitaj_audio(putanja: str, window_size: int = WINDOW_SIZE,
         signal[i:i + window_size] * hann
         for i in range(0, len(signal) - window_size + 1, hop_size)
     ]
- 
+    
     return np.array(prozori, dtype=np.float32), sample_rate
 
 def ucitaj_noizeus_skup(tip_suma: str, snr: str, window_size: int = WINDOW_SIZE, 
@@ -74,3 +74,18 @@ def rekonstruisi_ola(prozori: np.ndarray, window_size: int = WINDOW_SIZE,
 def sacuvaj_wav(putanja: str, sample_rate: int, signal: np.ndarray) -> None:
     data = (np.clip(signal, -1, 1) * 32767).astype(np.int16)
     wavfile.write(putanja, sample_rate, data)
+
+def spektralna_normalizacija(prozori: np.ndarray, faktor: float | None = None):
+    fft = np.fft.rfft(prozori, axis=1)
+    mag = np.log1p(np.abs(fft))
+    if faktor is None:
+        faktor = float(np.max(mag)) or 1.0
+    return mag / faktor, faktor, np.angle(fft)
+
+def rekonstruisi_iz_spektra(mag_norm: np.ndarray, faktor: float, faze: np.ndarray, 
+                            window_size: int = WINDOW_SIZE, 
+                            hop_size: int = HOP_SIZE) -> np.ndarray:
+    mag = np.expm1(mag_norm * faktor)
+    spektar = mag * np.exp(1j * faze)
+    prozori = np.fft.irfft(spektar, n=window_size)
+    return rekonstruisi_ola(prozori, window_size, hop_size)
