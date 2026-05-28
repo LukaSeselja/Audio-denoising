@@ -4,7 +4,13 @@ INPUT_DIM       = WINDOW_SIZE // 2 + 1
 
 HIDDEN_DIM      = 64
 
+EPOCHS         = 250
+LEARNING_RATE  = 0.02
+BATCH_SIZE     = 16
+
 NOIZEUS_DIR     = "noizeus"
 NOIZEUS_TOTAL   = 30
 
 MODEL_PATH      = "model_tezine.npz"
+
+RANDOM_SEED    = 42

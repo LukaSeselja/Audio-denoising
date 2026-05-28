@@ -1,5 +1,5 @@
 import numpy as np
-from config import INPUT_DIM, HIDDEN_DIM
+from config import INPUT_DIM, HIDDEN_DIM, MODEL_PATH
 
 class DenoisingAutoencoder:
 
@@ -43,4 +43,10 @@ class DenoisingAutoencoder:
         self.b1 -= lr * self.db1
         self.W2 -= lr * self.dW2
         self.b2 -= lr * self.db2
+
+    def sacuvaj(self, putanja: str = MODEL_PATH, norm_faktor: float = 1.0) -> None:
+            np.savez(putanja, W1=self.W1, b1=self.b1, W2=self.W2, b2=self.b2,
+                    input_dim=self.input_dim, hidden_dim=self.hidden_dim,
+                    norm_faktor=norm_faktor)
+            print(f"  Model sačuvan: {putanja}")
                  
