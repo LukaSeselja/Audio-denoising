@@ -49,4 +49,12 @@ class DenoisingAutoencoder:
                     input_dim=self.input_dim, hidden_dim=self.hidden_dim,
                     norm_faktor=norm_faktor)
             print(f"  Model sačuvan: {putanja}")
-                 
+
+    @classmethod
+    def ucitaj(cls, putanja: str = MODEL_PATH) -> tuple["DenoisingAutoencoder", float]:
+        d = np.load(putanja)
+        mdl = cls(int(d['input_dim']), int(d['hidden_dim']))
+        mdl.W1, mdl.b1, mdl.W2, mdl.b2 = d['W1'], d['b1'], d['W2'], d['b2']
+        norm_faktor = float(d['norm_faktor']) if 'norm_faktor' in d else 1.0
+        print(f"  Model učitan: {putanja}")
+        return mdl, norm_faktor             

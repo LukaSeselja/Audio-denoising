@@ -1,3 +1,7 @@
 .git
 __pycache__/
 .vscode/
+izlaz_trening/
+izlaz_test/
+*.npz
+noizeus/
