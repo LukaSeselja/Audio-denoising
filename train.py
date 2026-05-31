@@ -3,8 +3,9 @@ import time
 import numpy as np
 from config import (WINDOW_SIZE, HOP_SIZE, HIDDEN_DIM, INPUT_DIM,
                     EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, RANDOM_SEED)
-from data import ucitaj_noizeus_skup, rekonstruisi_iz_spektra, sacuvaj_wav
+from data import ucitaj_noizeus_skup, rekonstruisi_iz_spektra, sacuvaj_wav, ucitaj_audio
 from model import DenoisingAutoencoder
+from metrics import ispisi_metrike
 
 def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
     np.random.seed(RANDOM_SEED)
@@ -52,3 +53,7 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
         os.makedirs("izlaz_trening")
 
     sacuvaj_wav(os.path.join("izlaz_trening", "trening_ociscen.wav"), sr, audio_ociscen)
+
+    prozori, _ = ucitaj_audio("izlaz_trening/trening_ociscen.wav", WINDOW_SIZE, HOP_SIZE)
+    min_prozora = min(len(Y_tr), len(X_tr), len(prozori))
+    ispisi_metrike("Trening", Y_tr[:min_prozora], X_tr[:min_prozora], prozori[:min_prozora])

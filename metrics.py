@@ -12,3 +12,8 @@ def izracunaj_snr(signal: np.ndarray, suma: np.ndarray) -> float:
     snaga_signala = np.mean(signal ** 2)
     snaga_suma = np.mean(razlika ** 2)
     return float(10 * np.log10(snaga_signala / snaga_suma))
+
+def ispisi_metrike(tag, Y_tr, X_tr, ocisceni_prozori):
+    lsd = izracunaj_lsd(Y_tr, ocisceni_prozori)
+    snr = izracunaj_snr(Y_tr.flatten(), ocisceni_prozori.flatten())
+    print(f"[{tag}] LSD: {lsd:.2f} dB | SNR: {snr:.2f} dB")
