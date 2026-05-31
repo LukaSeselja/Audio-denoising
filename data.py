@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from scipy.io import wavfile
-from config import WINDOW_SIZE, HOP_SIZE, NOIZEUS_DIR
+from config import WINDOW_SIZE, HOP_SIZE, NOIZEUS_DIR, NOIZEUS_N_TRAIN, NOIZEUS_TOTAL
 
 def ucitaj_signal(putanja: str) -> tuple[np.ndarray, int]:
     sample_rate, signal = wavfile.read(putanja)
@@ -31,17 +31,38 @@ def ucitaj_audio(putanja: str, window_size: int = WINDOW_SIZE,
 
 def ucitaj_noizeus_skup(tip_suma: str, snr: str, window_size: int = WINDOW_SIZE, 
                         hop_size: int = HOP_SIZE):
-    folder_sum  = os.path.join(NOIZEUS_DIR, f"{tip_suma}_{snr}dB")
+    folder_sum = os.path.join(NOIZEUS_DIR, f"{tip_suma}_{snr}dB")
     folder_cist = os.path.join(NOIZEUS_DIR, "clean")
 
-    svi_fajlovi = sorted([f for f in os.listdir(folder_sum) if f.endswith('.wav')])
+    if not os.path.exists(folder_sum):
+        raise FileNotFoundError(
+            f"Folder '{folder_sum}' nije pronađen.\n"
+        )
     
-    trening_fajlovi = svi_fajlovi[:20]
-    test_fajlovi    = svi_fajlovi[20:]
+    if not os.path.exists(folder_cist):
+        raise FileNotFoundError(
+            f"Folder sa čistim fajlovima '{folder_cist}' nije pronađen."
+        )
+
+    svi_fajlovi = sorted([f for f in os.listdir(folder_sum) if f.endswith('.wav')])
+
+    if len(svi_fajlovi) != NOIZEUS_TOTAL:
+        raise ValueError(
+            f"Očekivano {NOIZEUS_TOTAL} fajlova u '{folder_sum}', "
+            f"pronađeno {len(svi_fajlovi)}."
+        )
+    
+    trening_fajlovi = svi_fajlovi[:NOIZEUS_N_TRAIN]
+    test_fajlovi = svi_fajlovi[NOIZEUS_N_TRAIN:]
+
+    print(f"  Trening fajlovi ({len(trening_fajlovi)}): "
+          f"{trening_fajlovi[0]} {trening_fajlovi[-1]}")
+    print(f"  Test fajlovi ({len(test_fajlovi)}): "
+          f"{test_fajlovi[0]} {test_fajlovi[-1]}")
 
     def ucitaj_listu(fajlovi, folder, je_cist=False):
         sve = []
-        sr  = None
+        sr = None
         for ime in fajlovi:
             base = ime.split('_')[0] + '.wav' if je_cist else ime
             p, s = ucitaj_audio(os.path.join(folder, base), window_size, hop_size)
@@ -49,18 +70,19 @@ def ucitaj_noizeus_skup(tip_suma: str, snr: str, window_size: int = WINDOW_SIZE,
             sr = s
         return np.concatenate(sve, axis=0), sr
 
-    X_tr, sr = ucitaj_listu(trening_fajlovi, folder_sum,  je_cist=False)
+    X_tr, sr = ucitaj_listu(trening_fajlovi, folder_sum, je_cist=False)
     Y_tr, _  = ucitaj_listu(trening_fajlovi, folder_cist, je_cist=True)
-    X_te, _  = ucitaj_listu(test_fajlovi,    folder_sum,  je_cist=False)
-    Y_te, _  = ucitaj_listu(test_fajlovi,    folder_cist, je_cist=True)
+    X_te, _  = ucitaj_listu(test_fajlovi, folder_sum, je_cist=False)
+    Y_te, _  = ucitaj_listu(test_fajlovi, folder_cist, je_cist=True)
 
+    print(f"  Trening prozora: {len(X_tr)} | Test prozora: {len(X_te)}")
     return X_tr, Y_tr, X_te, Y_te, sr
 
 def rekonstruisi_ola(prozori: np.ndarray, window_size: int = WINDOW_SIZE, 
                      hop_size: int = HOP_SIZE) -> np.ndarray:
     n = prozori.shape[0]
     duzina = (n - 1) * hop_size + window_size
-    out  = np.zeros(duzina, dtype=np.float32)
+    out = np.zeros(duzina, dtype=np.float32)
     suma = np.zeros(duzina, dtype=np.float32)
     hann = np.hanning(window_size)
 
