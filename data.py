@@ -96,6 +96,7 @@ def rekonstruisi_ola(prozori: np.ndarray, window_size: int = WINDOW_SIZE,
 def sacuvaj_wav(putanja: str, sample_rate: int, signal: np.ndarray) -> None:
     data = (np.clip(signal, -1, 1) * 32767).astype(np.int16)
     wavfile.write(putanja, sample_rate, data)
+    print(f"  Sačuvan: {putanja}")
 
 def spektralna_normalizacija(prozori: np.ndarray, faktor: float | None = None):
     fft = np.fft.rfft(prozori, axis=1)

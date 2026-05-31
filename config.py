@@ -21,4 +21,7 @@ NOIZEUS_NOISE_TYPES = [
 
 MODEL_PATH          = "model_tezine.npz"
 
+IZLAZ_TRENING_DIR   = "izlaz_trening"
+IZLAZ_TEST_DIR      = "izlaz_test"
+
 RANDOM_SEED         = 42
