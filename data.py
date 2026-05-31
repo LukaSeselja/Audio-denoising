@@ -68,7 +68,7 @@ def rekonstruisi_ola(prozori: np.ndarray, window_size: int = WINDOW_SIZE,
         s = i * hop_size
         out[s:s + window_size]  += p * hann
         suma[s:s + window_size] += hann ** 2
-
+    suma[suma < 1e-4] = 1.0
     return out / suma
 
 def sacuvaj_wav(putanja: str, sample_rate: int, signal: np.ndarray) -> None:
