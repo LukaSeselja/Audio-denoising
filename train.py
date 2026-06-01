@@ -8,7 +8,7 @@ from config import (WINDOW_SIZE, HOP_SIZE, HIDDEN_DIM, INPUT_DIM,
                     EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, RANDOM_SEED,
                     IZLAZ_TRENING_DIR, REZULTATI_PATH)
 from data import (ucitaj_noizeus_skup, rekonstruisi_ola, 
-                  rekonstruisi_iz_spektra, sacuvaj_wav)
+                  rekonstruisi_iz_spektra, sacuvaj_wav, crtaj_grafikon)
 from model import DenoisingAutoencoder
 from metrics import ispisi_metrike
 
@@ -73,11 +73,20 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
                    "trening": rezultati_tr}, f, indent=2)
     print(f"\n  Metrike sačuvane: {REZULTATI_PATH}")
 
-    plt.figure(figsize=(10, 3))
-    plt.plot(hist_tr, color='steelblue', label='Train MSE')
-    plt.title('Learning curve'); 
-    plt.xlabel('Epoch'); 
-    plt.ylabel('MSE')
-    plt.legend(); 
-    plt.grid(True, alpha=0.4)
-    plt.savefig(os.path.join(IZLAZ_TRENING_DIR, "rezultat.png"), dpi=120)
+    fig, axes = plt.subplots(4, 1, figsize=(13, 16))
+    axes[0].plot(hist_tr, color='steelblue', label='Train MSE')
+    axes[0].set_title(f'Learning curve - {tip_suma}, SNR={snr} dB'); 
+    axes[0].set_xlabel('Epoch'); 
+    axes[0].set_ylabel('MSE')
+    axes[0].legend(); 
+    axes[0].grid(True, alpha=0.4)
+
+    signals = [audio_cist, audio_sumovit, audio_ociscen]
+    titles = ['Čist', f'Šumovit ({snr} dB)', 'Očišćen']
+    colors = ['green', 'red', 'dodgerblue']
+    crtaj_grafikon(axes[1:], signals, titles, colors)
+
+    plt.tight_layout()
+    putanja = os.path.join(IZLAZ_TRENING_DIR, "rezultati.png")   
+    plt.savefig(putanja, dpi=120)
+    print(f'  Grafikon: {putanja}')

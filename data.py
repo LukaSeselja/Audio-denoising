@@ -112,3 +112,13 @@ def rekonstruisi_iz_spektra(mag_norm: np.ndarray, faktor: float, faze: np.ndarra
     spektar = mag * np.exp(1j * faze)
     prozori = np.fft.irfft(spektar, n=window_size)
     return rekonstruisi_ola(prozori, window_size, hop_size)
+
+def crtaj_grafikon(axes, signals, titles, colors):
+    for ax, signal, title, color in zip(axes, signals, titles, colors):
+        sred = len(signal) // 2
+        ax.plot(np.arange(4000), signal[sred:sred+4000], color=color, linewidth=0.8)
+        ax.set_title(title)
+        ax.set_ylabel('Amplitude')
+        ax.set_ylim([-0.3, 0.3])
+        ax.grid(True, alpha=0.4)
+    axes[-1].set_xlabel('Sample')

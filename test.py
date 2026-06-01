@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from config import (WINDOW_SIZE, HOP_SIZE, MODEL_PATH, IZLAZ_TEST_DIR, REZULTATI_PATH)
-from data import (ucitaj_noizeus_skup, rekonstruisi_iz_spektra, sacuvaj_wav, rekonstruisi_ola)
+from data import (ucitaj_noizeus_skup, rekonstruisi_iz_spektra, sacuvaj_wav, rekonstruisi_ola, crtaj_grafikon)
 from model import DenoisingAutoencoder
 from metrics import ispisi_metrike
 
@@ -15,7 +15,7 @@ def testiraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
 
     os.makedirs(IZLAZ_TEST_DIR, exist_ok=True)
         
-    print("\nKorak 1/3 - Učitavanje modela...")
+    print("Korak 1/3 - Učitavanje modela...")
     mreza, norm_faktor = DenoisingAutoencoder.ucitaj(model_path)
 
     try:
@@ -67,18 +67,16 @@ def testiraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
         json.dump(podaci, f, indent=2)
     print(f"\n  Metrike sačuvane: {REZULTATI_PATH}")
 
-    _, axes = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
-    t = np.arange(4000)
-    for ax, sig, title, color in zip(
-        axes,
-        [audio_cist, audio_sumovit, audio_ociscen],
-        ['Čist', f'Šumovit ({snr} dB)', 'Očišćen'],
-        ['green', 'red', 'dodgerblue']
-    ):
-        sred = len(sig) // 2
-        ax.plot(t, sig[sred:sred+4000], color=color, linewidth=0.8)
-        ax.set_title(title); ax.set_ylabel('Amplituda')
-        ax.set_ylim([-0.3, 0.3]); ax.grid(True, alpha=0.4)
-    axes[-1].set_xlabel('Sample')
+    # Grafikon
+    fig, axes = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
+
+    signals = [audio_cist, audio_sumovit, audio_ociscen]
+    titles = ['Čist', f'Šumovit ({snr} dB)', 'Očišćen']
+    colors = ['green', 'red', 'dodgerblue']
+    crtaj_grafikon(axes, signals, titles, colors)
+    fig.suptitle(f'Test - {scenario}', fontsize=12, fontweight='bold')
     plt.tight_layout()
-    plt.savefig(os.path.join(IZLAZ_TEST_DIR, f"{prefix}_rezultat.png"), dpi=120)
+
+    putanja = os.path.join(IZLAZ_TEST_DIR, f"{prefix}_rezultat.png")
+    plt.savefig(putanja, dpi=120)
+    print(f'  Grafikon: {putanja}')
