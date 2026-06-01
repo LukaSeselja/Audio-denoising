@@ -9,10 +9,11 @@ def main():
 
     parser.add_argument(
         "--mode", required=True, 
-        choices=["train", "test"], 
+        choices=["train", "test", "compare"], 
         help=(
             "train -> trenira model na NOIZEUS skupu\n"
             "test -> testira model\n"
+            "compare -> Uporedjivanje rezultata\n"
         ),
     )
     
@@ -36,6 +37,9 @@ def main():
 
     args = parser.parse_args()
 
+    if not args.model.endswith('.npz'):
+        args.model += '.npz'  
+
     if args.mode in ("train", "test"):
         if args.noise is None:
             parser.error(f'--noise je obavezan za --mode {args.mode}')
@@ -49,6 +53,10 @@ def main():
     elif args.mode == "test":
         from test import testiraj
         testiraj(tip_suma=args.noise, snr=args.snr, model_path=args.model)
+
+    elif args.mode == "compare":
+        from compare import uporedi
+        uporedi()
 
 if __name__ == "__main__":
     main()
