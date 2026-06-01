@@ -34,7 +34,8 @@ class DenoisingAutoencoder:
 
     def backward(self, X: np.ndarray, Y: np.ndarray) -> None:
         m = X.shape[0]
-        dZ2 = self.A2 - Y.T
+        clip_mask = (self.A2 > 0).astype(np.float32)
+        dZ2 = ((self.A2.T - Y) * clip_mask.T).T
         self.dW2 = (dZ2 @ self.A1.T) / m
         self.db2 = dZ2.sum(axis=1, keepdims=True) / m
         dZ1 = (self.W2.T @ dZ2) * self._lrelu_d(self.Z1)
