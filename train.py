@@ -16,7 +16,7 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
     np.random.seed(RANDOM_SEED)
     os.makedirs(IZLAZ_TRENING_DIR, exist_ok=True)
     
-    print(f"Korak 1/4 - Učitavanje NOIZEUS ({tip_suma}, {snr} dB)...")
+    print(f"\nKorak 1/4 - Učitavanje NOIZEUS ({tip_suma}, {snr} dB)...")
     X_tr, Y_tr, _, _, sr = ucitaj_noizeus_skup(tip_suma, snr, WINDOW_SIZE, HOP_SIZE)
 
     X_fft = np.fft.rfft(X_tr, axis=1)

@@ -15,7 +15,7 @@ def testiraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
 
     os.makedirs(IZLAZ_TEST_DIR, exist_ok=True)
         
-    print("Korak 1/3 - Učitavanje modela...")
+    print("\nKorak 1/3 - Učitavanje modela...")
     mreza, norm_faktor = DenoisingAutoencoder.ucitaj(model_path)
 
     try:
