@@ -63,7 +63,7 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
     sacuvaj_wav(os.path.join(IZLAZ_TRENING_DIR, "ociscen.wav"),  sr, audio_ociscen)
 
     print("\nKorak 4/4 - Metrike")
-    ispisi_metrike("TRENING", audio_cist, audio_ociscen)
+    ispisi_metrike("TRENING", audio_cist, audio_sumovit, audio_ociscen)
 
     plt.figure(figsize=(10, 3))
     plt.plot(hist_tr, color='steelblue', label='Train MSE')

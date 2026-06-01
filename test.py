@@ -40,7 +40,7 @@ def testiraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
     sacuvaj_wav(os.path.join(IZLAZ_TEST_DIR, f"{prefix}_ociscen.wav"), sr, audio_ociscen)
 
     print("\nKorak 3/3 - Metrike")
-    ispisi_metrike(f"TEST - {tip_suma}_{snr}dB", audio_cist, audio_ociscen)
+    ispisi_metrike(f"TEST - {tip_suma}_{snr}dB", audio_cist, audio_sumovit, audio_ociscen)
 
     _, axes = plt.subplots(3, 1, figsize=(12, 9), sharex=True)
     t = np.arange(4000)
