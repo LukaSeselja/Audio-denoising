@@ -1,13 +1,14 @@
 import os
+import json
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 
 from config import (WINDOW_SIZE, HOP_SIZE, HIDDEN_DIM, INPUT_DIM,
                     EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, RANDOM_SEED,
-                    IZLAZ_TRENING_DIR)
+                    IZLAZ_TRENING_DIR, REZULTATI_PATH)
 from data import (ucitaj_noizeus_skup, rekonstruisi_ola, 
-                  rekonstruisi_iz_spektra, sacuvaj_wav, ucitaj_audio)
+                  rekonstruisi_iz_spektra, sacuvaj_wav)
 from model import DenoisingAutoencoder
 from metrics import ispisi_metrike
 
@@ -47,7 +48,7 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
         hist_tr.append(greska / n_batch)
 
         if epoha % 50 == 0 or epoha == 1:
-            print(f"  Epoha {epoha:>3}/{EPOCHS} | MSE: {greska / n_batch:.6f}")
+            print(f"  Epoha {epoha:>3}/{EPOCHS} | MSE: {hist_tr[-1]:.6f}")
 
     print(f"  Trening završen za {time.time() - t0:.1f}s")
     mreza.sacuvaj(model_path, norm_faktor=X_faktor)
@@ -63,7 +64,14 @@ def treniraj(tip_suma: str, snr: str, model_path: str = MODEL_PATH) -> None:
     sacuvaj_wav(os.path.join(IZLAZ_TRENING_DIR, "ociscen.wav"),  sr, audio_ociscen)
 
     print("\nKorak 4/4 - Metrike")
-    ispisi_metrike("TRENING", audio_cist, audio_sumovit, audio_ociscen)
+    print("=" * 62)
+    rezultati_tr = ispisi_metrike("TRENING", audio_cist, audio_sumovit, audio_ociscen, sr=sr)
+    print("=" * 62)
+
+    with open(REZULTATI_PATH, 'w') as f:
+        json.dump({"tip_suma": tip_suma, "snr": snr,
+                   "trening": rezultati_tr}, f, indent=2)
+    print(f"\n  Metrike sačuvane: {REZULTATI_PATH}")
 
     plt.figure(figsize=(10, 3))
     plt.plot(hist_tr, color='steelblue', label='Train MSE')

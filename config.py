@@ -20,6 +20,7 @@ NOIZEUS_NOISE_TYPES = [
 ]
 
 MODEL_PATH          = "model_tezine.npz"
+REZULTATI_PATH      = "rezultati.json"
 
 IZLAZ_TRENING_DIR   = "izlaz_trening"
 IZLAZ_TEST_DIR      = "izlaz_test"
