@@ -30,7 +30,7 @@ class DenoisingAutoencoder:
         self.A1 = self._lrelu(self.Z1)
         self.Z2 = self.W2 @ self.A1 + self.b2
         self.A2 = self.Z2
-        return self.A2.T
+        return np.maximum(0, self.A2.T)
 
     def backward(self, X: np.ndarray, Y: np.ndarray) -> None:
         m = X.shape[0]
